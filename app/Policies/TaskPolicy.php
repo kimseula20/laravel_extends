@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\User;
+use App\Task;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TaskPolicy
@@ -21,7 +22,6 @@ class TaskPolicy
 
     public function destroy(User $user, Task $task)
     {
-//        dd($user->all());
         return $user->id === $task->user_id;
     }
 }
