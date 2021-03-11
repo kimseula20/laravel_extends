@@ -21,6 +21,7 @@ class TaskPolicy
 
     public function destroy(User $user, Task $task)
     {
+//        dd($user->all());
         return $user->id === $task->user_id;
     }
 }
