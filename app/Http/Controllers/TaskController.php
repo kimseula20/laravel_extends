@@ -7,6 +7,8 @@ use App\Http\Requests;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\TaskRepository;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class TaskController extends Controller
 {
@@ -23,7 +25,10 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $tasks = Task::where('user_id', $request->user()->id)->get();
+//        $tasks = DB::table('tasks')->where('user_id', $request->user()->id)->where('is_delete', 'N')->paginate(15);
+//        $tasks = DB::select('SELECT * FROM tasks WHERE user_id = ? AND is_delete = "N"', [$request->user()->id]);
+
+        $tasks = $this->tasks->infoTaskList($request);
 
         return view('tasks', ['tasks' => $tasks]);
     }
@@ -44,19 +49,13 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Requests\StoreTaskPost $request)
     {
-        $this->validate($request, [
-            'name' => 'required|max:255',
-            'description' => 'required|max:255',
-        ]);
+        $result = $this->tasks->insertTask($request);
 
-        $request->user()->tasks()->create([
-            'name' => $request->name,
-            'description' => $request->description,
-        ]);
-
-        return redirect('/tasks');
+        if($result){
+            return redirect('/tasks');
+        }
     }
 
     /**
@@ -67,7 +66,7 @@ class TaskController extends Controller
      */
     public function show(Request $request)
     {
-        //
+
     }
 
     /**
@@ -76,9 +75,11 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request)
+    public function edit($id)
     {
-        //
+        $task = $this->tasks->infoTask($id);
+
+        return view('modify', ['task'=>$task[0]]);
     }
 
     /**
@@ -88,9 +89,13 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Requests\StoreTaskPost $request, $id)
     {
-        //
+        $result = $this->tasks->updateTask($request, $id);
+
+        if($result) {
+            return redirect('/tasks');
+        }
     }
 
     /**
@@ -99,14 +104,14 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, Task $task)
+    public function destroy(Task $task)
     {
-//        dd($task->all());
-//        dd($request->all());
         $this->authorize('destroy', $task);
 
-        $task->delete();
+        $result = $this->tasks->deleteTask($task);
 
-        return redirect('/tasks');
+        if($result) {
+            return redirect('/tasks');
+        }
     }
 }

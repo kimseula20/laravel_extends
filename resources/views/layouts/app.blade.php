@@ -76,6 +76,7 @@
         </nav>
 
         @yield('content')
+        @include('sweetalert::alert')
     </div>
 
     <!-- Scripts -->

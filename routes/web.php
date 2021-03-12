@@ -17,10 +17,10 @@ Route::get('/', function () {
 
 Route::get('/tasks', 'TaskController@index');
 Route::get('/tasks/create', 'TaskController@create')->name('tasks.create');
-Route::post('/tasks/create', 'TaskController@store')->name('tasks.store');
-Route::get('/tasks/edit/{task}', 'TaskController@edit');
-Route::post('/tasks/update/{task}', 'TaskController@update')->name('tasks.update');
-Route::get('/tasks/show/{task}', 'TaskController@show');
+Route::post('/tasks', 'TaskController@store')->name('tasks.store');
+Route::get('/tasks/{task}', 'TaskController@show');
+Route::get('/tasks/{task}/edit', 'TaskController@edit');
+Route::patch('/tasks/{task}', 'TaskController@update');
 Route::delete('/tasks/{task}', 'TaskController@destroy');
 
 Auth::routes();
